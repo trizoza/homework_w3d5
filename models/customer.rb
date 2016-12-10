@@ -8,8 +8,8 @@ class Customer
   def initialize( options )
     @id = options['id'].to_i unless options['id'].nil?
     @name = options['name']
-    @funds = options['funds'].to_i
-    @annual_pass = false
+    @funds = options['funds'].to_f
+    @annual_pass = options['annual_pass']
   end
 
   def save()
@@ -30,7 +30,7 @@ class Customer
     return SqlRunner.run( sql )[0]
   end
 
-  def delete() #ADD HERE DELETION FROM TICKETS TABLE TOO
+  def delete()
     sql = "
       DELETE FROM customers
       WHERE id = #{@id};
@@ -42,7 +42,7 @@ class Customer
   def update()
     sql = "
       UPDATE customers
-      SET (name) = ('#{@name}')
+      SET (funds) = (#{@funds})
       WHERE id = #{@id};
     "
     SqlRunner.run( sql )
@@ -61,6 +61,31 @@ class Customer
     "
     SqlRunner.run( sql )
     puts "Customer table was deleted, entirely!"
+  end
+
+  def buy_annual_pass()
+    ########### Customer declaration #########################
+    sql_to_find_customer = "
+      SELECT * FROM customers
+      WHERE id = #{@id};
+    "
+    customer = SqlRunner.run( sql_to_find_customer )[0]
+    customer_funds = customer['funds'].to_f
+    customer_annual_pass = customer['annual_pass']
+    ########## Funds check ###################################
+    if customer_funds >= 100
+      ### Funds update & Annual pass update to TRUE ##########
+      customer_funds -= 100
+      customer_annual_pass = true
+      sql_customer_update ="
+        UPDATE customers
+        SET (funds, annual_pass) = (#{customer_funds}, #{customer_annual_pass})
+        WHERE id = #{@id};
+      "
+      SqlRunner.run( sql_customer_update )
+    else
+      puts "Customer cannot buy the annual pass, because his funds are lower than 100$."
+    end
   end
 
 end

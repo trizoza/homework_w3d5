@@ -6,15 +6,15 @@ require_relative ('models/ticket')
 Customer.delete_all()
 Movie.delete_all()
 
-customer1 = Customer.new({ "name" => "Matthew", "funds" => "350" })
+customer1 = Customer.new({ "name" => "Matthew", "funds" => 350, "annual_pass" => false })
 customer1.save()
-customer2 = Customer.new({ "name" => "Beth", "funds" => "500" })
+customer2 = Customer.new({ "name" => "Beth", "funds" => 500, "annual_pass" => false })
 customer2.save()
-customer3 = Customer.new({ "name" => "Craig", "funds" => "300" })
+customer3 = Customer.new({ "name" => "Craig", "funds" => 300, "annual_pass" => false  })
 customer3.save()
-customer4 = Customer.new({ "name" => "Rick", "funds" => "250" })
+customer4 = Customer.new({ "name" => "Rick", "funds" => 250, "annual_pass" => false  })
 customer4.save()
-customer5 = Customer.new({ "name" => "Simon", "funds" => "400" })
+customer5 = Customer.new({ "name" => "Simon", "funds" => 400, "annual_pass" => false  })
 customer5.save()
 
 movie1 = Movie.new({ "title" => "Up!", "price" => 9.99, "show_time" => "20:00", "available_tickets" => 5 })
@@ -37,6 +37,18 @@ movie9 = Movie.new({ "title" => "Inside Out", "price" => 8.99, "show_time" => "2
 movie9.save()
 movie10 = Movie.new({ "title" => "Bugs Life", "price" => 3.99, "show_time" => "16:00", "available_tickets" => 5 })
 movie10.save()
+
+ticket1 = Ticket.new({ "customer_id" => customer1.id, "movie_id" => movie1.id })
+ticket1.buy()
+ticket2 = Ticket.new({ "customer_id" => customer2.id, "movie_id" => movie2.id })
+ticket2.buy()
+ticket3 = Ticket.new({ "customer_id" => customer3.id, "movie_id" => movie3.id })
+ticket3.buy()
+
+customer4.buy_annual_pass()
+
+ticket4 = Ticket.new({ "customer_id" => customer4.id, "movie_id" => movie4.id })
+ticket4.buy()
 
 binding.pry
 nil
