@@ -88,4 +88,23 @@ class Customer
     end
   end
 
+  def movies()
+    sql = "
+      SELECT movies.* FROM movies
+      INNER JOIN tickets ON tickets.movie_id = movies.id
+      WHERE #{@id} = customer_id
+    "
+    return SqlRunner.run( sql ).map { |movie| Movie.new(movie) }
+  end
+
+  def tickets_bought()
+    sql = "
+      SELECT movies.title FROM movies
+      INNER JOIN tickets ON tickets.movie_id = movies.id
+      WHERE #{@id} = customer_id
+    "
+    number_of_tickets = SqlRunner.run( sql ).map { |movie| Movie.new(movie) }
+    return number_of_tickets.count()
+  end
+
 end

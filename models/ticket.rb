@@ -11,7 +11,7 @@ class Ticket
   end
 
   def buy()
-    ########## Customer & Movie Declaration #####################
+    ########## Customer & Movie Search ############################
     sql_to_find_customer = "
       SELECT * FROM customers
       WHERE id = #{@customer_id};
@@ -78,13 +78,49 @@ class Ticket
     end
   end
 
-  # def cancel()
-  #   sql = "
-  #     DELETE FROM tickets
-  #     WHERE id = {@id};
-  #   "
-  #   SqlRunner.run( sql )
-  # end
+  def cancel()
+    ############## FIND CUSTOMER #################################
+    sql_to_find_customer = "
+      SELECT * FROM customers
+      WHERE id = #{@customer_id};
+    "
+    customer = SqlRunner.run( sql_to_find_customer )[0]
+    ############## FIND MOVIE ####################################
+    sql_to_find_movie = "
+      SELECT * FROM movies
+      WHERE id = #{@movie_id};
+    "
+    movie = SqlRunner.run( sql_to_find_movie )[0]
+    ######REFUND CUSTOMER UNLESS ANNUAL PASS HOLDER ##############
+    if customer['annual_pass'] == "f"
+      movie_price = movie['price'].to_f
+      customer_funds = customer['funds'].to_f
+      customer_funds += movie_price
+      refund_sql = "
+        UPDATE customers
+        SET funds = #{customer_funds}
+        WHERE id = #{@customer_id};
+      "
+      SqlRunner.run( refund_sql )
+      puts "Customer #{customer['name']} was refunded #{movie['price']}$ after ticket cancellation."
+    end
+    ##### INCREASE AVAILABLE TICKETS FOR MOVIE ###################
+    movie_available_tickets = movie['available_tickets'].to_i
+    movie_available_tickets += 1
+    capacity_increase_sql = "
+      UPDATE movies
+      SET available_tickets = #{movie_available_tickets}
+      WHERE id = #{@movie_id};
+    "
+    SqlRunner.run( capacity_increase_sql )
+    puts "Movie #{movie['title']} screened at #{movie['show_time']} has #{movie_available_tickets} available tickets after the cancellation."
+    ############### DELETE TICKET ################################
+    sql = "
+      DELETE FROM tickets
+      WHERE id = #{@id};
+    "
+    SqlRunner.run( sql )
+  end
 
   def self.all()
     sql = "

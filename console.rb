@@ -49,6 +49,14 @@ customer4.buy_annual_pass()
 
 ticket4 = Ticket.new({ "customer_id" => customer4.id, "movie_id" => movie4.id })
 ticket4.buy()
+ticket5 = Ticket.new({ "customer_id" => customer4.id, "movie_id" => movie5.id })
+ticket5.buy()
+ticket6 = Ticket.new({ "customer_id" => customer3.id, "movie_id" => movie2.id })
+ticket6.buy()
+ticket7 = Ticket.new({ "customer_id" => customer4.id, "movie_id" => movie2.id })
+ticket7.buy()
+ticket8 = Ticket.new({ "customer_id" => customer5.id, "movie_id" => movie2.id })
+ticket8.buy()
 
 binding.pry
 nil

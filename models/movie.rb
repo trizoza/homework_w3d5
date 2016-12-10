@@ -64,4 +64,23 @@ class Movie
     puts "Movie table was deleted, entirely!"
   end
 
+  def customers()
+    sql = "
+      SELECT customers.* FROM customers
+      INNER JOIN tickets ON tickets.customer_id = customers.id
+      WHERE #{@id} = movie_id;
+    "
+    return SqlRunner.run( sql ).map { |customer| Customer.new(customer) }
+  end
+
+  def tickets_sold()
+    sql = "
+      SELECT customers.name FROM customers
+      INNER JOIN tickets ON tickets.customer_id = customers.id
+      WHERE #{@id} = movie_id;
+    "
+    number_of_tickets = SqlRunner.run( sql ).map { |customer| Customer.new(customer) }
+    return number_of_tickets.count()
+  end
+
 end
