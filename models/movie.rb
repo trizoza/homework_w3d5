@@ -3,20 +3,20 @@ require_relative ('../db/sql_runner')
 class Movie
 
   attr_reader :id
-  attr_accessor :title, :price, :show_time, :available_tickets
+  attr_accessor :title, :price, :show_time, :capacity, :available_tickets
 
   def initialize(options)
     @id = options['id'].to_i unless options['id'].nil?
     @title = options['title']
     @price = options['price'].to_f #find out how to make it with 2 decimal values
-    @show_time = options['show_time']
+    @capacity = options['capacity'].to_i
     @available_tickets = options['available_tickets'].to_i
   end
 
   def save()
     sql = "
-      INSERT INTO movies (title, price, show_time, available_tickets)
-      VALUES ('#{@title}', #{@price}, '#{@show_time}', #{@available_tickets})
+      INSERT INTO movies (title, price, capacity, available_tickets)
+      VALUES ('#{@title}', #{@price}, #{@capacity}, #{@capacity})
       RETURNING *;
     "
     @id = SqlRunner.run( sql )[0]['id'].to_i
@@ -43,7 +43,7 @@ class Movie
   def update()
     sql = "
       UPDATE movies
-      SET (title, price, show_time) = ('#{@title}', #{price}, '#{@show_time}')
+      SET (title, price) = ('#{@title}', #{price})
       WHERE id = #{@id};
     "
     SqlRunner.run( sql )
@@ -81,6 +81,29 @@ class Movie
     "
     number_of_tickets = SqlRunner.run( sql ).map { |customer| Customer.new(customer) }
     return number_of_tickets.count()
+  end
+
+  def popular_time()
+    ##### CRETING PG OBJECT WITH ALL SHOWTIMES OF MOVIE ##########################
+    sql = "
+      SELECT show_time FROM tickets
+      WHERE movie_id = #{@id};
+    "
+    array_of_showtimes = SqlRunner.run( sql ).map { |ticket| Ticket.new(ticket).show_time }
+    ##### TURNING PG OBJECT INTO HASH WHERE KEY AND VALUES REPRESENT ONE TIME ####
+    times_grouped_to_hash = {}
+    times_grouped_to_hash = array_of_showtimes.group_by { |i| i }
+    ##### TURNING HASH INTO ARRAY OF ARRAYS WITH VALUES ONLY #####################
+    times_hash_values = []
+    times_hash_values = times_grouped_to_hash.values
+    ##### KEEPING ONLY THE ARRAY WITH MOST VALUES ################################
+    array_of_most_common_times_only = []
+    array_of_most_common_times_only = times_hash_values.max_by { |x| x.count() }
+    ##### RETURNING MOST POPULAR TIME ############################################
+    most_common_time = array_of_most_common_times_only.first()
+    ##### RETURNING HOW MANY TICKETS WERE SOLD FOR THE MOST POPULAR TIME #########
+    number_of_sold_tickets = array_of_most_common_times_only.count()
+    puts "Most popular time for #{@title} movie is at #{most_common_time} with #{number_of_sold_tickets} sold tickets."
   end
 
 end

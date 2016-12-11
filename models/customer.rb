@@ -92,7 +92,7 @@ class Customer
     sql = "
       SELECT movies.* FROM movies
       INNER JOIN tickets ON tickets.movie_id = movies.id
-      WHERE #{@id} = customer_id
+      WHERE #{@id} = customer_id;
     "
     return SqlRunner.run( sql ).map { |movie| Movie.new(movie) }
   end
@@ -101,7 +101,7 @@ class Customer
     sql = "
       SELECT movies.title FROM movies
       INNER JOIN tickets ON tickets.movie_id = movies.id
-      WHERE #{@id} = customer_id
+      WHERE #{@id} = customer_id;
     "
     number_of_tickets = SqlRunner.run( sql ).map { |movie| Movie.new(movie) }
     return number_of_tickets.count()

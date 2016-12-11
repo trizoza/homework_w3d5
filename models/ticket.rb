@@ -2,12 +2,13 @@ require_relative ('../db/sql_runner')
 
 class Ticket
 
-  attr_reader :customer_id, :movie_id
+  attr_reader :customer_id, :movie_id, :show_time
 
   def initialize( options )
     @id = options['id'].to_i unless options['id'].nil?
     @customer_id = options['customer_id'].to_i
     @movie_id = options['movie_id'].to_i
+    @show_time = options['show_time']
   end
 
   def buy()
@@ -32,8 +33,8 @@ class Ticket
       if annual_pass == "t"     
         ########## Create ticket #################################
         sql = "
-          INSERT INTO tickets (customer_id, movie_id)
-          VALUES (#{@customer_id}, #{@movie_id})
+          INSERT INTO tickets (customer_id, movie_id, show_time)
+          VALUES (#{@customer_id}, #{@movie_id}, '#{show_time}')
           RETURNING *;
         "
         @id = SqlRunner.run( sql )[0]['id'].to_i
@@ -49,8 +50,8 @@ class Ticket
       elsif customer_funds >= movie_price
         ########## Create ticket #################################
         sql = "
-          INSERT INTO tickets (customer_id, movie_id)
-          VALUES (#{@customer_id}, #{@movie_id})
+          INSERT INTO tickets (customer_id, movie_id, show_time)
+          VALUES (#{@customer_id}, #{@movie_id}, '#{show_time}')
           RETURNING *;
         "
         @id = SqlRunner.run( sql )[0]['id'].to_i
@@ -113,7 +114,7 @@ class Ticket
       WHERE id = #{@movie_id};
     "
     SqlRunner.run( capacity_increase_sql )
-    puts "Movie #{movie['title']} screened at #{movie['show_time']} has #{movie_available_tickets} available tickets after the cancellation."
+    puts "Movie #{movie['title']} screened at #{@show_time} has #{movie_available_tickets} available tickets after the cancellation."
     ############### DELETE TICKET ################################
     sql = "
       DELETE FROM tickets

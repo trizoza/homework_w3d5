@@ -13,12 +13,13 @@ CREATE TABLE movies(
   id SERIAL4 PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   price NUMERIC NOT NULL CHECK (price > 0),
-  show_time TIME NOT NULL,
+  capacity INT4 NOT NULL,
   available_tickets INT4
 );
 
 CREATE TABLE tickets(
   id SERIAL4 PRIMARY KEY,
   customer_id INT4 REFERENCES customers(id) ON DELETE CASCADE,
-  movie_id INT4 REFERENCES movies(id) ON DELETE CASCADE
+  movie_id INT4 REFERENCES movies(id) ON DELETE CASCADE,
+  show_time TIME NOT NULL
 );
