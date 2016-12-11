@@ -13,16 +13,8 @@ class Ticket
 
   def buy()
     ########## Customer & Movie Search ############################
-    sql_to_find_customer = "
-      SELECT * FROM customers
-      WHERE id = #{@customer_id};
-    "
-    customer = SqlRunner.run( sql_to_find_customer )[0]
-    sql_to_find_movie = "
-      SELECT * FROM movies
-      WHERE id = #{@movie_id};
-    "
-    movie = SqlRunner.run( sql_to_find_movie )[0]
+    customer = Customer.find_customer_details( @customer_id )
+    movie = Movie.find_movie_details( @movie_id )
     available_tickets = movie['available_tickets'].to_i
     customer_funds = customer['funds'].to_f
     movie_price = movie['price'].to_f
@@ -81,17 +73,9 @@ class Ticket
 
   def cancel()
     ############## FIND CUSTOMER #################################
-    sql_to_find_customer = "
-      SELECT * FROM customers
-      WHERE id = #{@customer_id};
-    "
-    customer = SqlRunner.run( sql_to_find_customer )[0]
+    customer = Customer.find_customer_details( @customer_id )
     ############## FIND MOVIE ####################################
-    sql_to_find_movie = "
-      SELECT * FROM movies
-      WHERE id = #{@movie_id};
-    "
-    movie = SqlRunner.run( sql_to_find_movie )[0]
+    movie = Movie.find_movie_details( @movie_id )
     ######REFUND CUSTOMER UNLESS ANNUAL PASS HOLDER ##############
     if customer['annual_pass'] == "f"
       movie_price = movie['price'].to_f
@@ -127,6 +111,10 @@ class Ticket
     sql = "
       SELECT * FROM tickets;
     "
+    return Ticket.get_many( sql)
+  end
+
+  def self.get_many( sql )
     return SqlRunner.run( sql ).map { |ticket| Ticket.new(ticket) }
   end
 

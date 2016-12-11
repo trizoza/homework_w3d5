@@ -52,7 +52,7 @@ class Customer
     sql = "
       SELECT * FROM customers;
     "
-    return SqlRunner.run( sql ).map { |customer| Customer.new(customer) }
+    return Customer.get_many ( sql )
   end
 
   def self.delete_all()
@@ -94,7 +94,7 @@ class Customer
       INNER JOIN tickets ON tickets.movie_id = movies.id
       WHERE #{@id} = customer_id;
     "
-    return SqlRunner.run( sql ).map { |movie| Movie.new(movie) }
+    return Movie.get_many( sql )
   end
 
   def tickets_bought()
@@ -103,8 +103,20 @@ class Customer
       INNER JOIN tickets ON tickets.movie_id = movies.id
       WHERE #{@id} = customer_id;
     "
-    number_of_tickets = SqlRunner.run( sql ).map { |movie| Movie.new(movie) }
+    number_of_tickets = Movie.get_many( sql )
     return number_of_tickets.count()
+  end
+
+  def self.find_customer_details( customer_id )
+    sql = "
+      SELECT * FROM customers
+      WHERE id = #{ customer_id };
+    "
+    return SqlRunner.run( sql )[0]
+  end
+
+  def self.get_many( sql )
+    return SqlRunner.run( sql ).map { |customer| Customer.new(customer) }
   end
 
 end

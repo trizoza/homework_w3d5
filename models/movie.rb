@@ -53,7 +53,7 @@ class Movie
     sql = "
       SELECT * FROM movies;
     "
-    return SqlRunner.run( sql ).map { |movie| Movie.new(movie) }
+    return Movie.get_many( sql )
   end
 
   def self.delete_all()
@@ -70,7 +70,7 @@ class Movie
       INNER JOIN tickets ON tickets.customer_id = customers.id
       WHERE #{@id} = movie_id;
     "
-    return SqlRunner.run( sql ).map { |customer| Customer.new(customer) }
+    return Customer.get_many( sql )
   end
 
   def tickets_sold()
@@ -79,7 +79,7 @@ class Movie
       INNER JOIN tickets ON tickets.customer_id = customers.id
       WHERE #{@id} = movie_id;
     "
-    number_of_tickets = SqlRunner.run( sql ).map { |customer| Customer.new(customer) }
+    number_of_tickets = Customer.get_many( sql )
     return number_of_tickets.count()
   end
 
@@ -104,6 +104,18 @@ class Movie
     ##### RETURNING HOW MANY TICKETS WERE SOLD FOR THE MOST POPULAR TIME #########
     number_of_sold_tickets = array_of_most_common_times_only.count()
     puts "Most popular time for #{@title} movie is at #{most_common_time} with #{number_of_sold_tickets} sold tickets."
+  end
+
+  def self.find_movie_details( movie_id )
+    sql = "
+      SELECT * FROM movies
+      WHERE id = #{ movie_id };
+    "
+    return SqlRunner.run( sql )[0]
+  end
+
+  def self.get_many( sql )
+    return SqlRunner.run( sql ).map { |movie| Movie.new(movie) }
   end
 
 end
